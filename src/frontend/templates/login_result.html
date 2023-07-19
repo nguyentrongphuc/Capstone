@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>Vehicle info App</title>
+   
+  </head>
+  <body>
+    <div class="lists-wrapper">
+      <h1>Login Result with access token</h1>
+      
+      
+      <h3><div id="token"></div></h3>
+      
+    </div>
+
+    <script>
+      var fragment = window.location.hash.substr(1).split('&')[0].split('=');
+      var div = document.getElementById("token");
+
+      if ( fragment[0] === 'access_token' ) {
+        // add the access token to the jwt
+        div.innerHTML = fragment[1]; 
+        localStorage.setItem('JWTS_LOCAL_KEY', fragment[1])
+      }
+    </script>
+  </body>
+</html>

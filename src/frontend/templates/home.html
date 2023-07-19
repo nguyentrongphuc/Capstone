@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <title>Todo App</title>
+    <style>
+    .hidden {
+          display: none;
+    }
+    ul {
+      list-style: none;
+      padding:0;
+      margin: 0;
+      width: 250px;
+    }
+    li {
+      clear: both;
+    }
+    li button {
+      -webkit-appearance: none;
+      border: none;
+      outline: none;
+      color: red;
+      float: right;
+      cursor: pointer;
+      font-size: 20px;
+    }
+    .lists-wrapper, .todos-wrapper {
+      display: inline-block;
+      vertical-align: top;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="lists-wrapper">
+      <h3>Make LISTS</h3>
+      <form id='list_form'>
+        Create List: <input type="text" id='list_name' />
+        <input type="submit" value="Create List" />
+      </form>
+
+      <ul id="lists">
+        {% for make in makes %}
+        <li>
+          <a href="/{{ make.id }}" >
+            {{ make.name }}
+          </a>
+          <button class="list-delete" data-id="{{ make.id }}">&cross;</button>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="todos-wrapper">
+        <h3>Model</h3>
+        <form id='task_form'>
+          <input id="list_id" type="hidden" value="{{ active_make.id }}">
+          Create Task:<input type="text" id='description' />
+          <input type="submit" value="Create Task" />
+        </form>
+        <h4>{{ active_make.name }}</h4>
+        <ul id='todos'>
+          {% for model in models %}
+          <li id="list-{{ model.id }}">
+            {{ model.name }}
+            <button class="delete" data-id="{{ model.id }}">&cross;</button>
+          </li>
+          {% endfor %}
+        </ul>
+        
+      </div>
+
+    <div class = "hidden" id = "error" > Something went wrong! </div>
+
+  </body>
+</html>
