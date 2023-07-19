@@ -56,4 +56,6 @@ artifacts:
   files: build.json
 env:
   parameter-store:         
-    JWT_SECRET: JWT_SECRET
+    AUTH0_DOMAIN: AUTH0_DOMAIN
+    ALGORITHMS: ALGORITHMS
+    API_AUDIENCE: API_AUDIENCE
