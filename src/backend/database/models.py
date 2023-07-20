@@ -9,6 +9,12 @@ def setup_db(app):
         if not database_exists(app.config['DB_PATH']):
             create_database(app.config["DB_PATH"])
 
+    print(f'DB_PATH {app.config["DB_PATH"]}')
+
+    print(f'DB_HOST {app.config["DB_HOST"]}')
+
+    print(f'DB_USER {app.config["DB_USER"]}')
+
     db.app = app
     db.init_app(app)
 
