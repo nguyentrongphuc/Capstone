@@ -4,10 +4,6 @@ from sqlalchemy_utils import database_exists, create_database
 
 db = SQLAlchemy()
 
-
-
-
-
 def setup_db(app):
     if not app.config['TESTING']:
         print(f'DB_PATH {app.config["DB_PATH"]}')
