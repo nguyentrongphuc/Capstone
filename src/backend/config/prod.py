@@ -3,9 +3,9 @@ import os
 TESTING = False
 
 # Connect to the database 
-DB_HOST = os.environ('DB_HOST', '127.0.0.1:5432')  
-DB_USER = os.environ('DB_USER', 'postgres')  
-DB_PASSWORD = os.environ('DB_PASSWORD', 'P%40ssw0rd')  
+DB_HOST = os.environ.get('DB_HOST', '127.0.0.1:5432')  
+DB_USER = os.environ.get('DB_USER', 'postgres')  
+DB_PASSWORD = os.environ.get('DB_PASSWORD', 'P%40ssw0rd')  
 
 
 # DB_HOST = os.getenv('DB_HOST', 'vehicleinfo.cpozezvwnhgr.us-east-2.rds.amazonaws.com:5432')  
