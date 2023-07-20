@@ -14,6 +14,7 @@ def setup_db(app):
     print(f'DB_HOST {app.config["DB_HOST"]}')
 
     print(f'DB_USER {app.config["DB_USER"]}')
+    print(f'DB_PASSWORD {app.config["DB_PASSWORD"]}')
 
     print(f'DB_NAME {app.config["DB_NAME"]}')
 
