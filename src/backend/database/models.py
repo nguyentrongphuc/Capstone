@@ -6,6 +6,8 @@ db = SQLAlchemy()
 
 
 
+
+
 def setup_db(app):
     if not app.config['TESTING']:
         if not database_exists(app.config['DB_PATH']):
