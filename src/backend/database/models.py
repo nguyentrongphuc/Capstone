@@ -15,6 +15,8 @@ def setup_db(app):
 
     print(f'DB_USER {app.config["DB_USER"]}')
 
+    print(f'DB_NAME {app.config["DB_NAME"]}')
+
     db.app = app
     db.init_app(app)
 
