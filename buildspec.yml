@@ -38,6 +38,11 @@ phases:
         - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
         - cd $CODEBUILD_SRC_DIR/aws
         - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' capstone_api.yml
+
+
+        - sed -i 's@DB_HOST_VALUE@'"$DB_HOST"'@' capstone_api.yml
+        - sed -i 's@DB_PASSWORD_VALUE@'"$DB_PASSWORD"'@'  capstone_api.yml
+        
         - $(aws ecr get-login --no-include-email)
         - export KUBECONFIG=$HOME/.kube/config
 

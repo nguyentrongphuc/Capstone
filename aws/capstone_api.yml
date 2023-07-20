@@ -38,3 +38,8 @@ spec:
             allowPrivilegeEscalation: false
           ports:
             - containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: DB_HOST_VALUE
+            - name: DB_PASSWORD
+              value: DB_PASSWORD_VALUE
