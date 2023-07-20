@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, abort, render_template
-#from sqlalchemy import exc
 from flask_cors import CORS
 
 from database.models import setup_db, db_drop_and_create_all, VehicleMake, VehicleModel, db
