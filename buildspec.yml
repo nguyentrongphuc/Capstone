@@ -32,8 +32,8 @@ phases:
       - apt-get update && apt-get -y install jq  && pip install --upgrade awscli
   pre_build:
       commands:
-        - python -m pip install -r /backend/requirements.txt 
-        - python -m pytest /backend/main_test.py
+        - python -m pip install -r /src/backend/requirements.txt 
+        - python -m pytest /src/backend/main_test.py
         - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
         - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' /aws/capstone_api.yml
         - $(aws ecr get-login --no-include-email)
@@ -41,7 +41,7 @@ phases:
         - echo `ls -l`
   build:
     commands:
-      - cd backend
+      - cd /src/backend
       - docker build --tag $REPOSITORY_URI:$TAG .
 
   post_build:
