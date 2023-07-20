@@ -11,7 +11,6 @@ def setup_db(app):
 
     db.app = app
     db.init_app(app)
-    db_drop_and_create_all()
 
 def db_drop_and_create_all():
     db.drop_all()
