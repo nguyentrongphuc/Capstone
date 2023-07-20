@@ -1,6 +1,8 @@
 import os
 
-# Connect to the database
+TESTING = False
+
+# Connect to the database 
 DB_HOST = os.getenv('DB_HOST', '127.0.0.1:5432')  
 DB_USER = os.getenv('DB_USER', 'postgres')  
 DB_PASSWORD = os.getenv('DB_PASSWORD', 'P%40ssw0rd')  

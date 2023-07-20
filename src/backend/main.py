@@ -2,15 +2,21 @@ from flask import Flask, request, jsonify, abort, render_template
 #from sqlalchemy import exc
 from flask_cors import CORS
 
-from database.models import db_drop_and_create_all, setup_db, VehicleMake, VehicleModel, db
+from database.models import setup_db, db_drop_and_create_all, VehicleMake, VehicleModel, db
 from auth.auth import AuthError, requires_auth
 
 def create_app(test_config=None):
     app = Flask(__name__)
     app.app_context().push()
-    setup_db(app)
-    db_drop_and_create_all(app)
+        
+    if test_config is None:
+        app.config.from_object('config.prod')
+    else:
+        app.config.from_object(test_config)
 
+    setup_db(app)
+    db_drop_and_create_all()
+    
     CORS(app)
     @app.after_request
     def after_request(response):
@@ -199,4 +205,4 @@ def create_app(test_config=None):
 
     return app
 
-app = create_app()
+#app = create_app()

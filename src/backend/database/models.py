@@ -5,15 +5,15 @@ from sqlalchemy_utils import database_exists, create_database
 db = SQLAlchemy()
 
 def setup_db(app):
-    app.config.from_object('config')
-    if not database_exists(app.config['DB_PATH']):
-        create_database(app.config["DB_PATH"])
+    if not app.config['TESTING']:
+        if not database_exists(app.config['DB_PATH']):
+            create_database(app.config["DB_PATH"])
 
     db.app = app
     db.init_app(app)
-    db_drop_and_create_all(app)
+    db_drop_and_create_all()
 
-def db_drop_and_create_all(app):
+def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
     # add one demo row which is helping in POSTMAN test
