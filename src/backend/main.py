@@ -1,6 +1,5 @@
-import os
 from flask import Flask, request, jsonify, abort, render_template
-from sqlalchemy import exc
+#from sqlalchemy import exc
 from flask_cors import CORS
 
 from database.models import db_drop_and_create_all, setup_db, VehicleMake, VehicleModel, db
@@ -10,9 +9,9 @@ def create_app(test_config=None):
     app = Flask(__name__)
     app.app_context().push()
     setup_db(app)
+    db_drop_and_create_all(app)
+
     CORS(app)
-
-
     @app.after_request
     def after_request(response):
         response.headers.add(
@@ -22,7 +21,6 @@ def create_app(test_config=None):
             "Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS"
         )
         return response
-    db_drop_and_create_all()
 
     # ROUTES
     @app.route('/')

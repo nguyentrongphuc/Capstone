@@ -57,6 +57,7 @@ phases:
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
       - cd $CODEBUILD_SRC_DIR/aws
       - kubectl apply -f capstone_api.yml
+      - kubectl get svc,pods,nodes
       - printf '[{"name":"capstone_api","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
 artifacts:
   files: aws/build.json
@@ -65,3 +66,8 @@ env:
     AUTH0_DOMAIN: AUTH0_DOMAIN
     ALGORITHMS: ALGORITHMS
     API_AUDIENCE: API_AUDIENCE
+    DB_HOST: DB_HOST
+    DB_USER: DB_USER
+    DB_PASSWORD: DB_PASSWORD
+    DB_NAME: DB_NAME
+
