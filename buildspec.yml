@@ -37,12 +37,20 @@ phases:
         - python -m pytest main_test.py
         - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
         - cd $CODEBUILD_SRC_DIR/aws
+
         - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' capstone_api.yml
+        - sed -i 's@AUTH0_DOMAIN_VALUE@'"$AUTH0_DOMAIN"'@' capstone_api.yml
+        - sed -i 's@ALGORITHMS_VALUE@'"$ALGORITHMS"'@' capstone_api.yml
+        - sed -i 's@API_AUDIENCE_VALUE@'"$API_AUDIENCE"'@' capstone_api.yml
 
-
-        - sed -i 's@DB_HOST_VALUE@'"$DB_HOST"'@' capstone_api.yml
-        - sed -i 's@DB_PASSWORD_VALUE@'"$DB_PASSWORD"'@'  capstone_api.yml
+        - sed -i 's@AUTH0_CLIENT_ID_VALUE@'"$AUTH0_CLIENT_ID"'@' capstone_api.yml
+        - sed -i 's@AUTH0_CALLBACK_URL_VALUE@'"$AUTH0_CALLBACK_URL"'@' capstone_api.yml
         
+        - sed -i 's@DB_HOST_VALUE@'"$DB_HOST"'@' capstone_api.yml
+        - sed -i 's@DB_USER_VALUE@'"$DB_USER"'@' capstone_api.yml
+        - sed -i 's@DB_PASSWORD_VALUE@'"$DB_PASSWORD"'@'  capstone_api.yml
+        - sed -i 's@DB_NAME_VALUE@'"$DB_NAME"'@' capstone_api.yml
+
         - $(aws ecr get-login --no-include-email)
         - export KUBECONFIG=$HOME/.kube/config
 
@@ -55,8 +63,6 @@ phases:
 
   post_build:
     commands:
-      - echo $DB_HOST
-      - echo $DB_PASSWORD
       - docker push $REPOSITORY_URI:$TAG
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
@@ -72,6 +78,8 @@ env:
     AUTH0_DOMAIN: "AUTH0_DOMAIN"
     ALGORITHMS: "ALGORITHMS"
     API_AUDIENCE: "API_AUDIENCE"
+    AUTH0_CLIENT_ID: "AUTH0_CLIENT_ID"
+    AUTH0_CALLBACK_URL: "AUTH0_CALLBACK_URL"
     DB_HOST: "DB_HOST"
     DB_USER: "DB_USER"
     DB_PASSWORD: "DB_PASSWORD"

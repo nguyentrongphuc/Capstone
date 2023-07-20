@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, abort, render_template
 from flask_cors import CORS
 from database.models import setup_db, db_drop_and_create_all, VehicleMake, VehicleModel, db
-from auth.auth import AuthError, requires_auth
+from auth.auth import AuthError, requires_auth, build_login_link, build_logout_link
 
 def create_app(test_config=None): 
     app = Flask(__name__)
@@ -29,7 +29,9 @@ def create_app(test_config=None):
     # ROUTES
     @app.route('/')
     def home():
-        return render_template('home.html')
+        return render_template('home.html', 
+                                loginUrl = build_login_link(),
+                                logoutUrl = build_logout_link())
 
     @app.route('/makes')
     @requires_auth('get:vehicles')
@@ -117,10 +119,17 @@ def create_app(test_config=None):
         body = request.get_json()
         try:
             model_name = body.get('name', None)
+            exist_make = VehicleMake.query.get(makeId)
             exist_model = VehicleModel.query.filter(VehicleModel.makeId == makeId,
                                                     VehicleModel.name.like(model_name)).all()
-
-            if len(exist_model) == 0:
+            if exist_make is None:
+                return jsonify({
+                    "success": False, 
+                    "error": 422, 
+                    "message": "makeId=`" + str(makeId) + "` NOT existed"
+                })
+            
+            elif len(exist_model) == 0:
                 model = VehicleModel(
                     name = model_name,
                     makeId = makeId

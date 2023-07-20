@@ -5,10 +5,12 @@ from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
-AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN', 'phucnguyen.us.auth0.com')
-ALGORITHMS = os.environ.get('ALGORITHMS', 'RS256')
-ALGORITHMS = [ALGORITHMS]
+ALGORITHMS = [os.environ.get('ALGORITHMS', 'RS256')]
 API_AUDIENCE = os.environ.get('API_AUDIENCE', 'phuc')
+AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN', 'phucnguyen.us.auth0.com')
+AUTH0_CLIENT_ID = os.environ.get('AUTH0_CLIENT_ID', 'J804TumgtEPJ9Sr0MY6opWIu3SmgROM9')
+AUTH0_CALLBACK_URL = os.environ.get('AUTH0_CALLBACK_URL', 'http://127.0.0.1:5000/')
+
 
 ## AuthError Exception
 '''
@@ -20,9 +22,7 @@ class AuthError(Exception):
         self.error = error
         self.status_code = status_code
 
-
 ## Auth Header
-
 '''
     it should attempt to get the header from the request
         it should raise an AuthError if no header is present
@@ -153,7 +153,6 @@ def verify_decode_jwt(token):
                 'description': 'Unable to find the appropriate key.'
             }, 400)
 
-
 '''
     @INPUTS
         permission: string permission (i.e. 'post:vehicles')
@@ -174,3 +173,22 @@ def requires_auth(permission=''):
 
         return wrapper
     return requires_auth_decorator
+
+def build_login_link(callbackPath = ''):
+    link = 'https://'
+    link += AUTH0_DOMAIN
+    link += '/authorize?'
+    link += 'audience=' + API_AUDIENCE + '&'
+    link += 'response_type=token&'
+    link += 'client_id=' + AUTH0_CLIENT_ID + '&'
+    link += 'redirect_uri=' + AUTH0_CALLBACK_URL + callbackPath
+    return link;
+
+def build_logout_link(callbackPath = ''):
+    link = 'https://'
+    link += AUTH0_DOMAIN
+    link += '/v2/logout?'
+    link += 'audience=' + API_AUDIENCE + '&'
+    link += 'client_id=' + AUTH0_CLIENT_ID + '&'
+    link += 'returnTo=' + AUTH0_CALLBACK_URL + callbackPath
+    return link;
