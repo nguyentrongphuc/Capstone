@@ -10,17 +10,16 @@ db = SQLAlchemy()
 
 def setup_db(app):
     if not app.config['TESTING']:
+        print(f'DB_PATH {app.config["DB_PATH"]}')
+        print(f'DB_HOST {app.config["DB_HOST"]}')
+        print(f'DB_USER {app.config["DB_USER"]}')
+        print(f'DB_PASSWORD {app.config["DB_PASSWORD"]}')
+        print(f'DB_NAME {app.config["DB_NAME"]}')
+
         if not database_exists(app.config['DB_PATH']):
             create_database(app.config["DB_PATH"])
 
-        print(f'DB_PATH {app.config["DB_PATH"]}')
-
-        print(f'DB_HOST {app.config["DB_HOST"]}')
-
-        print(f'DB_USER {app.config["DB_USER"]}')
-        print(f'DB_PASSWORD {app.config["DB_PASSWORD"]}')
-
-        print(f'DB_NAME {app.config["DB_NAME"]}')
+        
 
     db.app = app
     db.init_app(app)
