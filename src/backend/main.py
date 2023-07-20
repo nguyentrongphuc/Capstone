@@ -29,6 +29,7 @@ def create_app(test_config=None):
     def home():
         return render_template('home.html')
 
+
     @app.route('/makes')
     @requires_auth('get:vehicles')
     def makes(jwt):
