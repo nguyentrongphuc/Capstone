@@ -8,7 +8,7 @@ from auth.auth import AuthError, requires_auth
 def create_app(test_config=None):
     app = Flask(__name__)
     app.app_context().push()
-        
+    
     if test_config is None:
         app.config.from_object('config.prod')
     else:
@@ -205,4 +205,4 @@ def create_app(test_config=None):
 
     return app
 
-#app = create_app()
+app = create_app()
