@@ -40,23 +40,26 @@ phases:
         - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' capstone_api.yml
         - $(aws ecr get-login --no-include-email)
         - export KUBECONFIG=$HOME/.kube/config
-        - echo `ls -l`
+
   build:
     commands:
       - cd $CODEBUILD_SRC_DIR/src/backend
+      - echo `ls -l`
+      - echo $REPOSITORY_URI
       - docker build --tag $REPOSITORY_URI:$TAG .
 
   post_build:
     commands:
+
       - docker push $REPOSITORY_URI:$TAG
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
       - cd $CODEBUILD_SRC_DIR/aws
-      - kubectl apply -f capstone_api.yml 
+      - kubectl apply -f capstone_api.yml
       - printf '[{"name":"capstone_api","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
 artifacts:
-  files: build.json
+  files: aws/build.json
 env:
   parameter-store:         
     AUTH0_DOMAIN: AUTH0_DOMAIN

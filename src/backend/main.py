@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort, render_template
 from sqlalchemy import exc
 from flask_cors import CORS
 
@@ -25,6 +25,10 @@ def create_app(test_config=None):
     db_drop_and_create_all()
 
     # ROUTES
+    @app.route('/')
+    def home():
+        return render_template('home.html')
+
     @app.route('/makes')
     @requires_auth('get:vehicles')
     def makes(jwt):
