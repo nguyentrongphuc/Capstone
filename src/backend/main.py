@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, abort, render_template
 from flask_cors import CORS
-
 from database.models import setup_db, db_drop_and_create_all, VehicleMake, VehicleModel, db
 from auth.auth import AuthError, requires_auth
 
@@ -8,7 +7,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
     app.app_context().push()
 
-    print(test_config)
+    #print(test_config)
     if test_config is None:
         app.config.from_object('config.prod')
     else:
