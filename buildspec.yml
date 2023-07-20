@@ -25,6 +25,7 @@ phases:
       - chmod +x ./kubectl ./aws-iam-authenticator      
       # - mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
       - export PATH=$PWD/:$PATH  
+      - cd $CODEBUILD_SRC_DIR/src/backend
       - python --version
       - echo 'export PATH=$PWD/:$PATH' >> $HOME/.bashrc
       - echo `kubectl version --short --client`
@@ -32,16 +33,17 @@ phases:
       - apt-get update && apt-get -y install jq  && pip install --upgrade awscli
   pre_build:
       commands:
-        - python -m pip install -r /src/backend/requirements.txt 
-        - python -m pytest /src/backend/main_test.py
+        - python -m pip install -r requirements.txt 
+        - python -m pytest main_test.py
         - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
-        - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' /aws/capstone_api.yml
+        - cd $CODEBUILD_SRC_DIR/aws
+        - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' capstone_api.yml
         - $(aws ecr get-login --no-include-email)
         - export KUBECONFIG=$HOME/.kube/config
         - echo `ls -l`
   build:
     commands:
-      - cd /src/backend
+      - cd $CODEBUILD_SRC_DIR/src/backend
       - docker build --tag $REPOSITORY_URI:$TAG .
 
   post_build:
@@ -50,6 +52,7 @@ phases:
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
+      - cd $CODEBUILD_SRC_DIR/aws
       - kubectl apply -f /aws/capstone_api.yml 
       - printf '[{"name":"capstone_api","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
 artifacts:
