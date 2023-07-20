@@ -4,9 +4,10 @@ import main
 
 from database.models import db_drop_and_create_all, setup_db, VehicleMake, VehicleModel
 
+
 class CapstoneTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
-    
+
     def setUp(self):
         self.app = main.create_app(test_config='config.test')
         self.client = self.app.test_client
