@@ -128,3 +128,163 @@ Open http://127.0.0.1:5000/ in a new browser - It will give you a response as
 We are using CI/CD pipeline and Github repository
 ![image](images/overview.png)
 
+## Prerequisite
+
+You must have the following:
+- AWS CLI installed and configured using the aws configure command.
+- The EKSCTL and KUBECTL command-line utilities installed in your system
+
+Setup your local AWS Credentials
+![image](images/aws_credentials.png)
+
+
+## Create EKS Cluster and IAM Role
+
+### Create - Create an EKS cluster named "capstone-api” in a region of your choice:
+```bash
+eksctl create cluster --name capstone-api --nodes=2 --version=1.22 --instance-types=t2.medium --region=us-east-2
+# Known Issue - If your default region is us-east-1, then the cluster creation may fail.
+```
+
+The command above will take a few minutes to execute, and create the following resources:
+- EKS cluster
+- A nodegroup containing two nodes.
+
+### Verify - After creating the cluster, check the health of your clusters nodes:
+Terminal
+```bash
+kubectl get nodes
+
+phucnt33@LPP00192074C backend % kubectl get nodes
+NAME                                           STATUS   ROLES    AGE     VERSION
+ip-192-168-22-159.us-east-2.compute.internal   Ready    <none>   2m25s   v1.22.17-eks-0a21954
+ip-192-168-52-151.us-east-2.compute.internal   Ready    <none>   2m25s   v1.22.17-eks-0a21954
+
+```
+
+AWS Console
+![image](images/cloud_formation.png)
+
+## Create IAM Role for Code build
+You will need an IAM role that the CodeBuild will assume to access your EKS cluster
+
+### Get your AWS Account ID 
+```bash
+# Returns the AWS account id similar to 
+# 342559418112
+```
+
+### Update the trust.json file with your AWS account id.
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::<ACCOUNT_ID>:root"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+```
+
+
+### Create a role, 'CapstoneCBKubectlRole', using the trust.json trust relationship:
+```bash
+### Assuming you are in the Capstone/aws directory
+aws iam create-role --role-name CapstoneCBKubectlRole --assume-role-policy-document file://trust.json --output text --query 'Role.Arn'
+# Returns something similar to 
+# arn:aws:iam::342559418112:role/CapstoneCBKubectlRole
+```
+
+### Attach the iam-role-policy.json policy to the 'UdacityFlaskDeployCBKubectlRole' as:
+```bash
+### Assuming you are in the Capstone/aws directory
+aws iam put-role-policy --role-name CapstoneCBKubectlRole --policy-name eks-describe --policy-document file://iam-role-policy.json
+```
+
+## Authorize the CodeBuild using EKS RBAC
+### Fetch - Get the current configmap and save it to a file
+```bash
+### Assuming you are in the Capstone/aws directory
+# Mac - I want to save aws-auth-patch.yml in <current_directory>/tmp/aws-auth-patch.yml
+kubectl get -n kube-system configmap/aws-auth -o yaml > ./tmp/aws-auth-patch.yml
+```
+
+### Edit - Open the aws-auth-patch.yml file using any editor, such as VS code editor:
+Add the following group in the data → mapRoles section of this file. YAML is 
+indentation-sensitive, therefore refer to the snapshot below for a correct indentation:
+```yml
+    - groups:
+        - system:masters
+        rolearn: arn:aws:iam::<ACCOUNT_ID>:role/UdacityFlaskDeployCBKubectlRole
+        username: build  
+```
+look at this sample Capstone/aws/aws-auth-patch.yml file 
+
+
+### Update - Update your cluster's configmap:
+```bash
+# Mac/Linux
+# ### Assuming you are in the Capstone/aws directory
+kubectl patch configmap/aws-auth -n kube-system --patch "$(cat ./tmp/aws-auth-patch.yml)"
+
+# The command above must show you as response as:
+# configmap/aws-auth patched
+```
+
+## Deployment to Kubernetes using CodePipeline and CodeBuild
+
+### Generate a Github access token
+Generate GitHub Access Token with full control of private repositories
+
+Once you create a personal access token, you can share this with any service (such as AWS CloudFormation) to allow accessing the repositories under your Github account.
+![image](images/github-access-token.png)
+
+### Create Postgres DB
+- Using AWS Console 
+- Go to RDS service and create Postgres DB
+- Chooses:
+    + Esay Create
+    + PostgresSQL
+    + Free Tier
+    + DB instance identifier: vehicleinfo
+    + username/password: postgres
+    + Don't connect to an EC2 compute resource (we may connect it later)
+
+- After complete, modify Postgress db choose
+    + Publicly accessible
+
+### Create Codebuild and CodePipeline resources using CloudFormation template
+#### Modify the template
+Modify file `Capstone/aws/ci-cd-codepipeline.cfn.yml`
+![image](images/pipeline.png)
+
+#### Create Stack based on the template above
+Using AWS Console to create stack
+![image](images/create_stack.png)
+
+### Save variables in AWS Parameter Store
+```bash
+aws ssm put-parameter --name AUTH0_DOMAIN --overwrite --value "phucnguyen.us.auth0.com" --type String
+aws ssm put-parameter --name API_AUDIENCE --overwrite --value "phuc" --type String
+aws ssm put-parameter --name AUTH0_CLIENT_ID --overwrite --value "J804TumgtEPJ9Sr0MY6opWIu3SmgROM9" --type String
+aws ssm put-parameter --name AUTH0_CALLBACK_URL --overwrite --value "<API_PUBLIC_IP>" --type String
+aws ssm put-parameter --name DB_HOST --overwrite --value "<POSTGRES_ENDPOINT>:5432" --type String
+# for example aws ssm put-parameter --name DB_HOST --overwrite --value "vehicleinfo.ctrhryqdkzdy.us-east-2.rds.amazonaws.com:5432" --type String
+
+aws ssm put-parameter --name DB_USER --overwrite --value "postgres" --type String
+aws ssm put-parameter --name DB_PASSWORD --overwrite --value "postgres" --type String
+aws ssm put-parameter --name DB_NAME --overwrite --value "vehicleinfo" --type String
+
+#NOTE: we may revist later for update DB_HOST and AUTH0_CALLBACK_URL
+#Verify
+aws ssm get-parameter --name AUTH0_DOMAIN
+``
+
+aws ssm put-parameter --name AUTH0_CALLBACK_URL --overwrite --value "vehicleinfo.ctrhryqdkzdy.us-east-2.rds.amazonaws.com:5432" --type String
+
+
+
