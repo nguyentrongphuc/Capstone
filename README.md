@@ -23,6 +23,166 @@ http://a69e21d0efe8345ab95207dd2e1343c2-1886797275.us-east-2.elb.amazonaws.com/
 
 # APIs Document
 
+## MAKES 
+
+### `GET '/makes'`
+
+- General:
+    + Fetches a list of makes
+    + it should require the 'get:vehicles' permission
+    + Request Headers:
+        + Authorization: Bearer <Token>
+- Returns: 
+  + `success`: true if the data exist in database.
+  + `total`: number of total makes
+  + `makes`: An json object
+  
+- Sample: `CURL --header "Authorization: Bearer <Token>" http://127.0.0.1:5000/makes`
+
+```json
+{
+    "makes": [
+        {
+            "id": 1,
+            "models": [
+                {
+                    "id": 1,
+                    "name": "Integra"
+                },
+                {
+                    "id": 2,
+                    "name": "MDX"
+                },
+                {
+                    "id": 3,
+                    "name": "ZDX"
+                }
+            ],
+            "name": "Acura"
+        },
+        {
+            "id": 2,
+            "models": [
+                {
+                    "id": 4,
+                    "name": "Giulia"
+                },
+                {
+                    "id": 5,
+                    "name": "Tonale"
+                }
+            ],
+            "name": "Alfa Romeo"
+        }
+    ],
+    "success": true,
+    "total": 2
+}
+```
+
+## MODELS 
+
+### `GET '/models'`
+
+- General:
+    + Fetches a list of models
+    it should require the 'get:vehicles' permission
+    + Request Headers:
+        + Authorization: Bearer <Token>
+- Returns: 
+  + `success`: true if the data exist in database.
+  + `total`: number of total models
+  + `makes`: An json object
+  
+- Sample: `CURL --header "Authorization: Bearer <Token>" http://127.0.0.1:5000/models`
+
+```json
+{
+    "models": [
+        {
+            "id": 1,
+            "makeName": "Acura",
+            "name": "Integra"
+        },
+        {
+            "id": 2,
+            "makeName": "Acura",
+            "name": "MDX"
+        },
+        {
+            "id": 3,
+            "makeName": "Acura",
+            "name": "ZDX"
+        },
+        {
+            "id": 4,
+            "makeName": "Alfa Romeo",
+            "name": "Giulia"
+        },
+        {
+            "id": 5,
+            "makeName": "Alfa Romeo",
+            "name": "Tonale"
+        }
+    ],
+    "success": true,
+    "total": 5
+}
+```
+
+## RESET DATA
+### `GET '/resetdata'`
+
+- General:
+    + Reset to default data and Fetches a list of makes
+    + it should require the 'admin' permission
+    + Request Headers:
+        + Authorization: Bearer <Token>
+- Returns: 
+  + `success`: true if the data exist in database.
+  + `total`: number of total makes
+  + `makes`: An json object
+  
+- Sample: `CURL --header "Authorization: Bearer <Token>" http://127.0.0.1:5000/resetdata`
+
+
+## UPDATE MAKE
+### `PATCH '/makes/<int:id>'`
+
+- General:
+    + Update Make
+    + it should require the 'patch:vehicles' permission
+    + Request Headers:
+        + Authorization: Bearer <Token>
+    + body: json
+- Returns: 
+  + `success`: true if the data be able to update into database.
+  + `total`: number of total makes
+  + `makes`: An json object
+  
+- Sample: `CURL --header "Authorization: Bearer <Token>" --d "{make: 'Honda'}" http://127.0.0.1:5000/makes/1`
+
+
+## INSERT MODEL
+### `POST '/models/<int:id>'`
+
+- General:
+    + Add new Make into model
+    + it should require the 'post:vehicles' permission
+    + Request Headers:
+        + Authorization: Bearer <Token>
+    + body: json
+- Returns: 
+  + `success`: true if the can insert new model in database.
+  + `total`: number of total makes
+  + `makes`: An json object
+  
+- Sample: `CURL --header "Authorization: Bearer <Token>" --d "{make: 'Civid'}" http://127.0.0.1:5000/models/1`
+
+
+
+
+
 # Postman
 
 # Project dependencies and Local development
@@ -278,6 +438,10 @@ aws ssm put-parameter --name DB_HOST --overwrite --value "<POSTGRES_ENDPOINT>:54
 aws ssm put-parameter --name DB_USER --overwrite --value "postgres" --type String
 aws ssm put-parameter --name DB_PASSWORD --overwrite --value "postgres" --type String
 aws ssm put-parameter --name DB_NAME --overwrite --value "vehicleinfo" --type String
+
+aws ssm put-parameter --name TOKEN_DEALER --overwrite --value "e<token>" --type String
+aws ssm put-parameter --name TOKEN_DEALER_MANAGER --overwrite --value "<token>" --type String
+
 
 #NOTE: we may revist later for update DB_HOST and AUTH0_CALLBACK_URL
 #Verify
