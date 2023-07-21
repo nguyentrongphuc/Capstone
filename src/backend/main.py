@@ -46,7 +46,7 @@ def create_app(test_config=None):
     '''
     @app.route('/resetdata')
     @requires_auth('admin')
-    def reset_date():
+    def reset_data(jwt):
         db_drop_and_create_all()
         makes = VehicleMake.query.all()
         list = [item.format() for item in makes]
