@@ -160,7 +160,7 @@ http://a69e21d0efe8345ab95207dd2e1343c2-1886797275.us-east-2.elb.amazonaws.com/
   + `total`: number of total makes
   + `makes`: An json object
   
-- Sample: `CURL --header "Authorization: Bearer <Token>" --d "{make: 'Honda'}" http://127.0.0.1:5000/makes/1`
+- Sample: `CURL -X PATCH --header "Authorization: Bearer <Token>" --d "{make: 'Honda'}" http://127.0.0.1:5000/makes/1`
 
 
 ## INSERT MODEL
@@ -177,9 +177,23 @@ http://a69e21d0efe8345ab95207dd2e1343c2-1886797275.us-east-2.elb.amazonaws.com/
   + `total`: number of total makes
   + `makes`: An json object
   
-- Sample: `CURL --header "Authorization: Bearer <Token>" --d "{make: 'Civid'}" http://127.0.0.1:5000/models/1`
+- Sample: `CURL -X POST --header "Authorization: Bearer <Token>" --d "{make: 'Civid'}" http://127.0.0.1:5000/models/1`
 
 
+## DELETE MAKE
+### `DELETE '/makes/<int:id>'`
+
+- General:
+    + delete make by id
+    + it should require the 'delete:vehicles' permission
+    + Request Headers:
+        + Authorization: Bearer <Token>
+- Returns: 
+  + `success`: true if the can DELETE model in database.
+  + `total`: number of total makes
+  + `makes`: An json object
+  
+- Sample: `CURL -X DELETE --header "Authorization: Bearer <Token>" --d "{make: 'Civid'}" http://127.0.0.1:5000/makes/1`
 
 
 

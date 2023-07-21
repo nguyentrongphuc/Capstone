@@ -4,7 +4,6 @@ from sqlalchemy_utils import database_exists, create_database
 
 db = SQLAlchemy()
 
-
 '''
 setup_db(app)
     binds a flask application and a SQLAlchemy service
