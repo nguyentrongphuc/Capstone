@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 body {
   margin: 0;
@@ -31,33 +32,196 @@ body {
   background-color: #04AA6D;
   color: white;
 }
-
+.topnav-right {
+  float: right;
+}
 .hidden {
   display: none;
 }
+
+.openBtn {
+  /* background: #f1f1f1;
+  border: none;
+  padding: 10px 15px;
+  font-size: 20px;
+  cursor: pointer; */
+  float: left;
+  background-color: #2196F3;
+  color: #ffffff;
+  width: 100px;
+  line-height: 100px;
+  text-align: center;
+  margin: 2px;
+  font-size: 30px;
+}
+
+.openBtn:hover {
+  background: #bbb;
+}
+  
+.add {
+  font-weight:bold;
+  color: #2196F3;
+}
+.filterDiv {
+  float: left;
+  background-color: #2196F3;
+  color: #ffffff;
+  width: 100px;
+  line-height: 100px;
+  text-align: center;
+  margin: 2px;
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+.container {
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+/* Style the buttons */
+.btn {
+  border: none;
+  outline: none;
+  padding: 12px 16px;
+  background-color: #f1f1f1;
+  cursor: pointer;
+  margin: 1px;
+}
+
+.btn:hover, .dropdown:hover .btn {
+  background-color: #ddd;
+}
+
+.btn.active {
+  background-color: #666;
+  color: white;
+}
+
+
+
 </style>
+
+<style>
+  body {
+    font-family: Arial;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  .overlay {
+    height: 100%;
+    width: 100%;
+    display: none;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgb(51, 51, 51);
+    background-color: rgba(52, 50, 50, 0.9);
+  }
+  
+  .overlay-content {
+    position: relative;
+    top: 46%;
+    width: 80%;
+    text-align: center;
+    margin-top: 30px;
+    margin: auto;
+  }
+  
+  .overlay .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 45px;
+    font-size: 60px;
+    cursor: pointer;
+    color: white;
+  }
+  
+  .overlay .closebtn:hover {
+    color: #ccc;
+  }
+  
+  .overlay input[type=text] {
+    padding: 15px;
+    font-size: 17px;
+    border: none;
+    float: left;
+    width: 80%;
+    background: white;
+  }
+  
+  .overlay input[type=text]:hover {
+    background: #f1f1f1;
+  }
+  
+  .overlay button {
+    float: left;
+    width: 20%;
+    padding: 15px;
+    background: #ddd;
+    font-size: 17px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .overlay button:hover {
+    background: #bbb;
+  }
+</style>
+
 </head>
 <body>
 
 <div class="topnav">
   <a id="nav_home" class=" active" href="#home">Home</a>
-  <a href="{{ loginUrl }}">Login</a>
-  <a id="nav_make" class="menu" href="#make">Make</a>
-  <a id="nav_logout" class="" href="#logout" logout-url = "{{ logoutUrl }}">Logout</a>
+  <a id="nav_make" href="#make">Vehicle</a>
+
+  <div class="topnav-right">
+    <a id="nav_login" href="{{ loginUrl }}">Login</a>
+    <a id="nav_logout" href="#logout" logout-url = "{{ logoutUrl }}">Logout</a>
+  </div>
 </div>
 
 <div style="padding-left:16px">
   <h2>Vehicle Information</h2>
   <div id="homepage">
-    <h3>Welcome to homepage</h3>
+    <p>Welcome to homepage</p>
   </div>
-  <div class="hidden" id="loginpage"></div>
-  <div class="" id="makepage">
-    <ul id="makes"/>
+  <div id="loginpage"></div>
+  
+  <div id="makepage">
+    <h2>Filter Models by Make</h2>
+
+    <div id="myBtnContainer">
+      
+      <button id="btnShowAll" class="btn active" data-id="0" onclick="filterSelection('all')"> Show all</button>
+    </div>
+    <div id="myModelContainer" class="container"></div>
+    <button id="btnAddModel" class="openBtn hidden" onclick="openSearch('model')">
+      <i class="fa fa-plus-circle"></i>
+    </button>
+
   </div>
   
+  <div id="logoutpage"><p>Log Out</p></div>
   <div class = "hidden" id = "error" > Something went wrong! </div>
 
+</div>
+
+<div id="myOverlay" class="overlay">
+  <span class="closebtn" onclick="closeSearch()" title="Close Overlay">×</span>
+  <div class="overlay-content">
+    <input id="txtInput" type="text" placeholder="Model Name.." mode="model" name="search">
+    <button onclick="saveVehicle()">Save</button>
+  </div>
 </div>
 
 <script>
@@ -66,69 +230,384 @@ body {
     var loginpage = document.getElementById("loginpage");
     var homepage = document.getElementById("homepage");
     var makepage = document.getElementById("makepage");
+    var logoutpage = document.getElementById("logoutpage");
+    var nav_login = document.getElementById('nav_login');
+    var nav_logout = document.getElementById('nav_logout');
+    var nav_home = document.getElementById('nav_home');
+    var nav_make = document.getElementById('nav_make');
 
-    if ( fragment[0] === 'access_token' ) {
-      loginpage.innerHTML = fragment[1]; 
-      loginpage.className = ''
+    if (fragment[0] === 'access_token' ) {
+      loginpage.innerHTML = fragment[1];
       localStorage.setItem('JWTS_LOCAL_KEY', fragment[1]) // add the access token to the jwt
-
+      setActivePage(loginpage, nav_login);
+    } else if (fragment=="logout") {
+      setActivePage(logoutpage, nav_logout);
+    } else {
+      setActivePage(homepage, nav_home);
     }
 
-    const nav_make = document.getElementById('nav_make');
+    
     nav_make.onclick = function(e) {
-      setTimeout(() => {
-        nav_make.className = 'active';
-        loginpage.className = 'hidden';
-        homepage.classname = 'hidden';
-      }, 10);
+      setActivePage(makepage, nav_make)
 
-      jwt = localStorage.getItem('JWTS_LOCAL_KEY');
+    jwt = localStorage.getItem('JWTS_LOCAL_KEY');
 
-      fetch('/makes', {
-        method: 'GET',
-        headers: {
-          'Content-type': 'application/json',
-          'Authorization': `Bearer ${jwt}`, // notice the Bearer before your token
-        },
-      })
-      .then(resp => resp.json())
-      .then(function(json) {
-        //console.log(JSON.stringify(json))
-        makes = document.getElementById('makes');
-        makes.innerHTML = ''
-        
-        for(let c=0; c<json['makes'].length; c++){
-          const liItem= document.createElement('LI');
-          liItem.innerHTML = json['makes'][c]['name'];
-          makes.appendChild(liItem);
-        }
-        document.getElementById('error').classname='hidden';
-          //window.location.reload(true);
-      })
-      .catch(function(ex) {
-        error =  document.getElementById('error').className='';
-      })
+    fetch('/makes', {
+      method: 'GET',
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': `Bearer ${jwt}`, // notice the Bearer before your token
+      },
+    })
+    .then(resp => resp.json())
+    .then(function(json) {
+      renderMake(json)
+    })
+    .catch(function(ex) {
+      error =  document.getElementById('error').className='';
+    })
     }
     
-    const nav_logout = document.getElementById('nav_logout');
     nav_logout.onclick = function(e) {
       nav_logout.classname='active';
       localStorage.setItem('JWTS_LOCAL_KEY', '');
       logout_url = nav_logout.getAttribute('logout-url');
       window.location.href = logout_url
+
     }
 
-    const nav_home = document.getElementById('nav_home');
     nav_home.onclick = function(e) {
-      setTimeout(() => {
-        loginpage.className='hidden';
-        makepage.className='hidden';
-        homepage.classname='';
-        nav_home.classname='active';
-      }, 10);
+      setActivePage(homepage, nav_home)
     }
     
   });
+  function renderMake(json){
+    //console.log(JSON.stringify(json))
+    var myBtnContainer = document.getElementById('myBtnContainer');
+    var myModelContainer = document.getElementById('myModelContainer');
+    
+    while (myBtnContainer.lastElementChild 
+          && myBtnContainer.lastElementChild != myBtnContainer.firstElementChild) {
+            myBtnContainer.removeChild(myBtnContainer.lastElementChild);
+    }
+    myBtnContainer.firstElementChild.className = 'btn active'
+    while (myModelContainer.lastElementChild) {
+            myModelContainer.removeChild(myModelContainer.lastElementChild);
+    }
+
+    for(let c=0; c<json['makes'].length; c++){
+      var makeName = json['makes'][c]['name'];
+      var makeId = json['makes'][c]['id']
+
+      createButton(makeId, makeName, myBtnContainer);
+      for(let i=0; i< json['makes'][c]['models'].length; i++) {
+        var modelName = json['makes'][c]['models'][i]['name'];
+        //var modelId = json['makes'][c]['models'][i]['id'];
+        createDiv(makeId, modelName, myModelContainer)
+      }
+    }
+    createCustomButton(myBtnContainer, 'fa-plus-circle');
+    createCustomButton(myBtnContainer, 'fa-edit');
+    createCustomButton(myBtnContainer, 'fa-remove');
+    
+    filterModelsbyMake( myBtnContainer.firstElementChild)
+    document.getElementById('error').classname='hidden';
+  }
+
+  function createButton(id, text, container){
+    var btn = document.createElement('button');
+    btn.innerHTML = text
+    btn.className = 'auto btn'
+    btn.setAttribute('data-id', id)
+    container.appendChild(btn)
+
+    btn.addEventListener("click", function(){
+      filterModelsbyMake(this);
+      filterSelection(id)
+    });
+  }
+
+  function createCustomButton(container, btn_style){
+    var btn = document.createElement('button');
+    btn.setAttribute('data-id', null);
+    
+    var icon = document.createElement('i');
+    icon.className = 'fa ' + btn_style;
+    btn.appendChild(icon);
+    container.appendChild(btn)
+    if (btn_style == 'fa-plus-circle') {
+      btn.className = 'add btn';
+      btn.addEventListener("click", function(){
+        openSearch('make');
+      });
+    } else if (btn_style == 'fa-remove') {
+      btn.className = 'updatedelete btn';
+      btn.addEventListener("click", function(){
+        deleteVehicle();
+      });
+    } else if (btn_style == 'fa-edit'){
+      btn.className = 'updatedelete btn';
+      btn.addEventListener("click", function(){
+        openSearch('updatemake');
+      });
+    }
+  }
+
+  function filterModelsbyMake(btn) {
+    var currentMake = document.getElementsByClassName("btn active")[0];
+    currentMake.className = currentMake.className.replace(" active", "");
+    btn.className += " active";
+
+    var makeId = btn.getAttribute('data-id');
+    var btnAddModel = document.getElementById('btnAddModel');
+    var update_delete = document.getElementsByClassName("updatedelete btn");
+    if (makeId !== "0") {
+      btnAddModel.className = btnAddModel.className.replace(" hidden", "");
+      update_delete[0].className = update_delete[0].className.replace(" hidden", "");
+      update_delete[1].classList.remove("hidden");
+    } else {
+      btnAddModel.classList.add("hidden");
+      update_delete[0].classList.add("hidden")
+      update_delete[1].classList.add("hidden")
+    }
+  }
+
+  function createDiv(id, text, container){
+    var div = document.createElement('div');
+    div.className = 'filterDiv ' + id + ' show';
+    div.innerHTML = text;
+    container.appendChild(div);
+  }
+  function setActivePage(activePage, activeNav) {
+    var loginpage = document.getElementById("loginpage");
+    var homepage = document.getElementById("homepage");
+    var makepage = document.getElementById("makepage");
+    var logoutpage = document.getElementById("logoutpage");
+
+    var nav_login = document.getElementById('nav_login');
+    var nav_logout = document.getElementById('nav_logout');
+    var nav_home = document.getElementById('nav_home');
+    var nav_make = document.getElementById('nav_make');
+
+
+    setTimeout(() => {
+      loginpage.className='hidden';
+      makepage.className='hidden';
+      homepage.className='hidden';
+      logoutpage.className='hidden';
+      
+      nav_home.className='';
+      nav_make.className='';
+      nav_login.className='';
+      nav_logout.className='';
+      
+      activeNav.className='active'
+      activePage.className=''
+    }, 10);
+    
+  }
+</script>
+
+<script>
+  filterSelection("all")
+  function filterSelection(c) {
+    var x, i;
+    x = document.getElementsByClassName("filterDiv");
+    if (c == "all") c = "";
+    for (i = 0; i < x.length; i++) {
+      w3RemoveClass(x[i], "show");
+      if (x[i].className.indexOf(c) > -1) w3AddClass(x[i], "show");
+    }
+  }
+  
+  function w3AddClass(element, name) {
+    var i, arr1, arr2;
+    arr1 = element.className.split(" ");
+    arr2 = name.split(" ");
+    for (i = 0; i < arr2.length; i++) {
+      if (arr1.indexOf(arr2[i]) == -1) {element.className += " " + arr2[i];}
+    }
+  }
+  
+  function w3RemoveClass(element, name) {
+    var i, arr1, arr2;
+    arr1 = element.className.split(" ");
+    arr2 = name.split(" ");
+    for (i = 0; i < arr2.length; i++) {
+      while (arr1.indexOf(arr2[i]) > -1) {
+        arr1.splice(arr1.indexOf(arr2[i]), 1);     
+      }
+    }
+    element.className = arr1.join(" ");
+  }
+
+  // Add active class to the current button (highlight it)
+  var btnContainer = document.getElementById("myBtnContainer");
+  var btnShowAll = document.getElementById('btnShowAll');
+  btnShowAll.addEventListener("click", function(){
+    filterModelsbyMake(this);
+  });
+  
+</script>
+
+<script>
+  function openSearch(mode) {
+    var txtInput = document.getElementById('txtInput');
+    txtInput.value = '';
+    txtInput.setAttribute('mode', mode)
+
+    if (mode === "make") {
+      txtInput.setAttribute('placeholder', 'Make name...');
+    } else if (mode === "model") {
+      txtInput.setAttribute('placeholder', 'Model name...');
+    } else if (mode === "updatemake") {
+      var currentMake = document.getElementsByClassName("btn active")[0];
+      txtInput.setAttribute('placeholder', 'Model name...');
+      txtInput.value = currentMake.textContent;
+    }
+    document.getElementById("myOverlay").style.display = "block";
+  }  
+  function closeSearch() {
+    document.getElementById("myOverlay").style.display = "none";
+  }
+  function UpdateVehicle() {
+    var currentMake = document.getElementsByClassName("btn active")[0];
+    var makeId = currentMake.getAttribute('data-id')
+
+    var txtInput = document.getElementById("txtInput");
+    var mode = txtInput.getAttribute('mode');
+  
+    var url = '';
+    var newVehicle = txtInput.value;
+    var body = JSON.stringify({name: newVehicle});
+
+    if (makeId == "0" || newVehicle == "") {
+      alert("No Make seletion or missing VehicleName");
+      return;
+    }
+
+    fetch('/makes/' + makeId, {
+      method: 'PATCH',
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': `Bearer ${jwt}`, // notice the Bearer before your token
+      },
+      body: body
+    })
+    .then(resp => resp.json())
+    .then(function(json) {
+      console.log(JSON.stringify(json));
+      if (json['success']) {
+        renderMake(json);
+        if (makeId == "0") {
+          filterSelection("all")
+        } else {
+          filterSelection(makeId);
+        }
+        
+        currentMake = document.querySelectorAll('[data-id="'+ makeId +'"]')
+        filterModelsbyMake(currentMake[0]);
+      } else {
+        alert(json['message']['code'] + ' - ' + json['message']['description']);
+      }
+    })
+    .catch(function(ex) {
+      error =  document.getElementById('error').className='';
+    })
+
+    document.getElementById("myOverlay").style.display = "none";
+  }
+
+  function deleteVehicle() {
+    var currentMake = document.getElementsByClassName("btn active")[0];
+    var makeId = currentMake.getAttribute('data-id')
+
+    if (makeId == "0") {
+      alert("No Make seletion");
+      return;
+    }
+
+    fetch('/makes/' + makeId, {
+      method: 'DELETE',
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': `Bearer ${jwt}`, // notice the Bearer before your token
+      }
+    })
+    .then(resp => resp.json())
+    .then(function(json) {
+      console.log(JSON.stringify(json));
+      if (json['success']) {
+        renderMake(json);
+      } else {
+        alert(json['message']['code'] + ' - ' + json['message']['description']);
+      }
+    })
+    .catch(function(ex) {
+      error =  document.getElementById('error').className='';
+    })
+
+    document.getElementById("myOverlay").style.display = "none";
+  }
+  function saveVehicle() {
+    var txtInput = document.getElementById("txtInput");
+    var mode = txtInput.getAttribute('mode');
+    if (mode === "updatemake") {
+      UpdateVehicle()
+    } else {
+      var url = '';
+      var message = ''
+      var newVehicle = txtInput.value;
+      var body = JSON.stringify({name: newVehicle});
+
+      var currentMake = document.getElementsByClassName("btn active")[0];
+      var makeId = currentMake.getAttribute('data-id')
+
+      if (mode === "make") {
+        url = '/makes';
+        message = "Make Name is required";
+      } else if (mode === "model") {       
+        url = '/models/' + makeId;
+        message = "Model Name is required";
+      }
+      if (newVehicle == "") {
+        alert(message);
+        return;
+      }
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+          'Authorization': `Bearer ${jwt}`, // notice the Bearer before your token
+        },
+        body: body
+      })
+      .then(resp => resp.json())
+      .then(function(json) {
+        if (json['success']) {
+          console.log(JSON.stringify(json));
+          renderMake(json);
+          if (makeId == "0") {
+            filterSelection("all")
+          } else {
+            filterSelection(makeId);
+          }
+          
+          currentMake = document.querySelectorAll('[data-id="'+ makeId +'"]')
+          filterModelsbyMake(currentMake[0]);
+        } else {
+          alert(json['message']);
+        }
+      })
+      .catch(function(ex) {
+        error =  document.getElementById('error').className='';
+      })
+
+      document.getElementById("myOverlay").style.display = "none";
+    }
+    
+  }
   
 </script>
 

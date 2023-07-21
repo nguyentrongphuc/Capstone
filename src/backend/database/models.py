@@ -4,13 +4,18 @@ from sqlalchemy_utils import database_exists, create_database
 
 db = SQLAlchemy()
 
+
+'''
+setup_db(app)
+    binds a flask application and a SQLAlchemy service
+'''
 def setup_db(app):
     if not app.config['TESTING']:
-        print(f'DB_PATH {app.config["DB_PATH"]}')
-        print(f'DB_HOST {app.config["DB_HOST"]}')
-        print(f'DB_USER {app.config["DB_USER"]}')
-        print(f'DB_PASSWORD {app.config["DB_PASSWORD"]}')
-        print(f'DB_NAME {app.config["DB_NAME"]}')
+        # print(f'DB_PATH {app.config["DB_PATH"]}')
+        # print(f'DB_HOST {app.config["DB_HOST"]}')
+        # print(f'DB_USER {app.config["DB_USER"]}')
+        # print(f'DB_PASSWORD {app.config["DB_PASSWORD"]}')
+        # print(f'DB_NAME {app.config["DB_NAME"]}')
 
         if not database_exists(app.config['DB_PATH']):
             create_database(app.config["DB_PATH"])
@@ -19,10 +24,17 @@ def setup_db(app):
     db.app = app
     db.init_app(app)
 
+'''
+db_drop_and_create_all()
+    drops the database tables and starts fresh
+    can be used to initialize a clean database
+    !!NOTE you can change the database_filename variable to have multiple verisons of a database
+'''
 def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
-    # add one demo row which is helping in POSTMAN test
+
+    # add somes demo row which is helping in POSTMAN test
     
     acura = VehicleMake( name='Acura')
     alfa_romeo = VehicleMake(name='Alfa Romeo')
@@ -50,10 +62,27 @@ class VehicleMake(db.Model):
     name = Column(String(80), unique=True)
     models = db.relationship('VehicleModel', backref='list', lazy=True)
     
+    '''
+    insert()
+        inserts a new model into a database
+        the model must have a unique name
+        the model must have a unique id or null id
+        EXAMPLE
+            make = VehicleMake(name=name)
+            make.insert()
+    '''
     def insert(self):
         db.session.add(self)
         db.session.commit()
     
+    '''
+    delete()
+        deletes a new model into a database
+        the model must exist in the database
+        EXAMPLE
+            make = VehicleMake(name=name)
+            make.delete()
+    '''
     def delete(self):
         db.session.delete(self)
         db.session.commit()
