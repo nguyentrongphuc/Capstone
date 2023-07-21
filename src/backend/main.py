@@ -7,7 +7,6 @@ def create_app(test_config=None):
     app = Flask(__name__)
     app.app_context().push()
 
-
     if test_config is None:
         app.config.from_object('config.prod')
     else:
