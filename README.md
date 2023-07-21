@@ -21,6 +21,26 @@ Capstone is provide to view, add new, delete vehicles
 
 http://a69e21d0efe8345ab95207dd2e1343c2-1886797275.us-east-2.elb.amazonaws.com/
 
+In this app, we have 3 accounts with three different roles
+
+- Admin account:
+    + username: admin@gmail.com
+    + password: P@ssw0rd
+    + Admin role be able to reset to default the data only
+
+- Manager account: 
+    + username: manager@gmail.com
+    + password: P@ssw0rd
+    + Manager can do anything except reset data
+
+- Dealer account:
+    + username: dealer01@gmail.com
+    + password: P@ssw0rd
+    + Dealer can do anything except reset and delete data
+
+Use the UI to login to get the token and we can use it in Postman as we as update it in Parameter store
+
+
 # APIs Document
 
 ## MAKES 
@@ -198,6 +218,25 @@ http://a69e21d0efe8345ab95207dd2e1343c2-1886797275.us-east-2.elb.amazonaws.com/
 
 
 # Postman
+See detail at [here](src/backend/capstone.postman_collection.json)
+```bash
+.
+├── DEALER SALE .
+│       ├── /makes/
+│       ├── /models/
+│       ├── /makes/search
+│       ├── /make/1/
+│       └── .........
+├── DEALER MANAGER
+│       ├── /makes/
+│       ├── /models/
+│       ├── /makes/search
+│       ├── /make/1/
+│       └── .........
+└── ADMIN
+        └── /resetdata
+
+```
 
 # Project dependencies and Local development
 ## Prerequisite and project dependencies
@@ -229,6 +268,7 @@ These are the files relevant for the current project:
 ├── src/backend.
 │       ├── main.py	                    # APs and one endpoint for simple fontend
 │       ├── test_main.py                # TODO - Unit Test file		
+│       ├── capstone.postman_collection.json    # Postman Testing file		
 │       └── requirements.txt
 ├── buildspec.yml                       # project builder
 │
@@ -296,6 +336,46 @@ Open http://127.0.0.1:5000/ in a new browser - It will give you a response as
 ![image](images/homepage.png)
 
 # Authentication
+## Auth0 Authorization
+
+- See detail on how to use and create an account with Auth0: https://auth0.com
+
+
+## Using the Auth0 Authorization Code Flow with Hosted Login Pages
+- You can see detail here: https://auth0.com/docs/api/authentication#authorize-application
+```bash
+https://{{YOUR_DOMAIN}}/authorize?audience={{API_IDENTIFIER}}&response_type=token&client_id={{YOUR_CLIENT_ID}}&redirect_uri={{YOUR_CALLBACK_URI}}
+```
+
+## Integrating Auth0 With Your Frontend
+
+To integrate Auth0 with your frontend you simply need to redirect your user to your Auth0 hosted login page and include a url to redirect them to upon completion. This can be done using a simple html anchor link:
+
+<a href="{{AUTH0_AUTHORIZE_URL}}">Login</a>
+
+In this project we can build {{AUTH0_AUTHORIZE_URL}} as the code 
+
+```python
+def build_login_link(callbackPath = ''):
+    link = 'https://'
+    link += AUTH0_DOMAIN
+    link += '/authorize?'
+    link += 'audience=' + API_AUDIENCE + '&'
+    link += 'response_type=token&'
+    link += 'client_id=' + AUTH0_CLIENT_ID + '&'
+    link += 'redirect_uri=' + AUTH0_CALLBACK_URL + callbackPath
+    return link;
+
+def build_logout_link(callbackPath = ''):
+    link = 'https://'
+    link += AUTH0_DOMAIN
+    link += '/v2/logout?'
+    link += 'audience=' + API_AUDIENCE + '&'
+    link += 'client_id=' + AUTH0_CLIENT_ID + '&'
+    link += 'returnTo=' + AUTH0_CALLBACK_URL + callbackPath
+    return link;
+
+```
 
 # AWS deployment instructions
 
