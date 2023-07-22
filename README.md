@@ -541,7 +541,7 @@ aws ssm put-parameter --name DB_USER --overwrite --value "postgres" --type Strin
 aws ssm put-parameter --name DB_PASSWORD --overwrite --value "postgres" --type String
 aws ssm put-parameter --name DB_NAME --overwrite --value "vehicleinfo" --type String
 
-aws ssm put-parameter --name TOKEN_DEALER --overwrite --value "e<token>" --type String
+aws ssm put-parameter --name TOKEN_DEALER --overwrite --value "<token>" --type String
 aws ssm put-parameter --name TOKEN_DEALER_MANAGER --overwrite --value "<token>" --type String
 
 
