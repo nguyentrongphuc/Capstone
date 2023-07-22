@@ -51,8 +51,8 @@ phases:
         - sed -i 's@DB_PASSWORD_VALUE@'"$DB_PASSWORD"'@'  capstone_api.yml
         - sed -i 's@DB_NAME_VALUE@'"$DB_NAME"'@' capstone_api.yml
 
-        # - sed -i 's@TOKEN_DEALER_VALUE@'"$TOKEN_DEALER"'@' capstone_api.yml
-        # - sed -i 's@TOKEN_DEALER_MANAGER_VALUE@'"$TOKEN_DEALER_MANAGER"'@' capstone_api.yml
+        - sed -i 's@TOKEN_DEALER_VALUE@'"$TOKEN_DEALER"'@' capstone_api.yml
+        - sed -i 's@TOKEN_DEALER_MANAGER_VALUE@'"$TOKEN_DEALER_MANAGER"'@' capstone_api.yml
 
         - $(aws ecr get-login --no-include-email)
         - export KUBECONFIG=$HOME/.kube/config

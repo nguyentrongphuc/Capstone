@@ -6,6 +6,11 @@
 5. [Project dependencies and Local development](#project-dependencies-and-local-development)
 6. [Authentication](#authentication)
 7. [AWS deployment instructions](#aws-deployment-instructions)
+    7.1 [Prerequisite](#prerequisite)
+    7.2 [Create EKS Cluster and IAM Role](#create-eks-cluster-and-iam-role)
+    7.3 [Authorize the CodeBuild using EKS RBAC](#authorize-the-codebuild-using-eks-rbac)
+    7.4 [Deployment to Kubernetes using CodePipeline and CodeBuild](#deployment-to-kubernetes-using-codepipeline-and-codebuild)
+
 
 # Overview
 
@@ -424,6 +429,7 @@ You will need an IAM role that the CodeBuild will assume to access your EKS clus
 
 ### Get your AWS Account ID 
 ```bash
+aws sts get-caller-identity --query Account --output text
 # Returns the AWS account id similar to 
 # 342559418112
 ```
