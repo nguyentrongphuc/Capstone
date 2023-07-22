@@ -528,6 +528,8 @@ Using AWS Console to create stack
 
 ### Save variables in AWS Parameter Store
 ```bash
+
+aws ssm put-parameter --name ALGORITHMS --overwrite --value "RS256" --type String
 aws ssm put-parameter --name AUTH0_DOMAIN --overwrite --value "phucnguyen.us.auth0.com" --type String
 aws ssm put-parameter --name API_AUDIENCE --overwrite --value "phuc" --type String
 aws ssm put-parameter --name AUTH0_CLIENT_ID --overwrite --value "J804TumgtEPJ9Sr0MY6opWIu3SmgROM9" --type String
