@@ -6,10 +6,10 @@
 5. [Project dependencies and Local development](#project-dependencies-and-local-development)
 6. [Authentication](#authentication)
 7. [AWS deployment instructions](#aws-deployment-instructions)
-    7.1 [Prerequisite](#prerequisite)
-    7.2 [Create EKS Cluster and IAM Role](#create-eks-cluster-and-iam-role)
-    7.3 [Authorize the CodeBuild using EKS RBAC](#authorize-the-codebuild-using-eks-rbac)
-    7.4 [Deployment to Kubernetes using CodePipeline and CodeBuild](#deployment-to-kubernetes-using-codepipeline-and-codebuild)
+    7. 1 [Prerequisite](#prerequisite)
+    7. 2 [Create EKS Cluster and IAM Role](#create-eks-cluster-and-iam-role)
+    7. 3 [Authorize the CodeBuild using EKS RBAC](#authorize-the-codebuild-using-eks-rbac)
+    7. 4 [Deployment to Kubernetes using CodePipeline and CodeBuild](#deployment-to-kubernetes-using-codepipeline-and-codebuild)
 
 
 # Overview
@@ -23,8 +23,7 @@ Capstone is provide to view, add new, delete vehicles
 ![image](images/capstone-vehicle-info.png)
 
 # Font End URL
-
-http://a69e21d0efe8345ab95207dd2e1343c2-1886797275.us-east-2.elb.amazonaws.com/
+http://a70b5d7390a1b4410b9674ac1181accb-2019063715.us-east-2.elb.amazonaws.com/
 
 In this app, we have 3 accounts with three different roles
 
@@ -342,8 +341,49 @@ Open http://127.0.0.1:5000/ in a new browser - It will give you a response as
 
 # Authentication
 ## Auth0 Authorization
-
 - See detail on how to use and create an account with Auth0: https://auth0.com
+### Create Auth0 Application
+
+![image](images/auth0_app_01.png)
+
+Some highlight fields
+- Domain 
+- Client Id
+- Client Secret 
+- Allowed Callback URLs
+- Allowed Logout URLs
+- ID Token Expiration
+- Allow Cross-Origin Authentication
+
+![image](images/auth0_app_02.png)
+
+### Create Auth0 API
+
+![image](images/auth0_api_01.png)
+
+#### Home highlight fields
+- Token Expiration For Browser Flows (seconds)
+- Enable RBAC
+
+#### Create Permission 
+![image](images/auth0_api_02.png)
+
+### User Management
+#### Create Roles
+
+Create `DealerManager` Role and assign Permission
+![image](images/user_role_01.png)
+
+Create other Roles
+![image](images/user_role_02.png)
+
+#### Create Users
+
+Create `dealermanager@gmail.com` with `DealerManager` Roles 
+![image](images/user_role_03.png)
+
+Create other Users
+![image](images/user_role_04.png)
 
 
 ## Using the Auth0 Authorization Code Flow with Hosted Login Pages
@@ -516,6 +556,8 @@ Once you create a personal access token, you can share this with any service (su
 
 - After complete, modify Postgress db choose
     + Publicly accessible
+    + Connectivity: choose Security group to the same with EC2
+    ![image](images/postgress_sg.png)
 
 ### Create Codebuild and CodePipeline resources using CloudFormation template
 #### Modify the template
@@ -549,8 +591,6 @@ aws ssm put-parameter --name TOKEN_DEALER_MANAGER --overwrite --value "<token>" 
 #Verify
 aws ssm get-parameter --name AUTH0_DOMAIN
 ``
-
-aws ssm put-parameter --name AUTH0_CALLBACK_URL --overwrite --value "vehicleinfo.ctrhryqdkzdy.us-east-2.rds.amazonaws.com:5432" --type String
 
 
 
