@@ -16,10 +16,6 @@ metadata:
   name: capstone-api
 spec:
   replicas: 3
-  resources:
-    limits:
-      cpus: "0.1"
-      memory: 50M
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -61,7 +57,7 @@ spec:
               value: DB_PASSWORD_VALUE
             - name: DB_NAME
               value: DB_NAME_VALUE
-            - name: TOKEN_DEALER
-              value: TOKEN_DEALER_VALUE
-            - name: TOKEN_DEALER_MANAGER
-              value: TOKEN_DEALER_MANAGER_VALUE
+            # - name: TOKEN_DEALER
+            #   value: TOKEN_DEALER_VALUE
+            # - name: TOKEN_DEALER_MANAGER
+            #   value: TOKEN_DEALER_MANAGER_VALUE

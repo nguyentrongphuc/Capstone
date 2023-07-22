@@ -396,7 +396,7 @@ Setup your local AWS Credentials
 
 ### Create - Create an EKS cluster named "capstone-api” in a region of your choice:
 ```bash
-eksctl create cluster --name capstone-api --nodes=2 --version=1.22 --instance-types=t2.medium --region=us-east-2
+eksctl create cluster --name capstone-api --nodes=2 --version=1.23 --instance-types=t2.medium --region=us-east-2
 # Known Issue - If your default region is us-east-1, then the cluster creation may fail.
 ```
 
